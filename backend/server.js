@@ -21,6 +21,15 @@ app.get('/api/products', async (req, res) => {
   }
 });
 
+app.post('/api/products', async (req, res) => {
+  try {
+    const newProduct = await Product.create(req.body);
+    res.status(201).json(newProduct);
+  } catch (error) {
+    res.status(400).json({ message: "Error creating product" });
+  }
+});
+
 app.get('/', (req , res) => {
   res.send('Server is running!');
 });
@@ -30,13 +39,13 @@ sequelize.sync().then(async() => {
   console.log('Database synced successfully');
 
   const count = await Product.count();
-  if (count < 2) {
+  if (count === 0) {
     await Product.create({
-      name: "Gaming Mouse Pro",
-      price: 59.99,
-      description: "Fast and precise, directly from SQL!"
+      name: "Database Headset",
+      price: 150.00,
+      description: "First product from SQLite!"
     });
-    console.log('Second Product added to the database');
+    console.log('First Product added to the database');
   }
 
   app.listen(PORT, () => {
