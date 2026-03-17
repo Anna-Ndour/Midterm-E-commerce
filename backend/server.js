@@ -12,13 +12,6 @@ const app = express();
 app.use(cors()); 
 app.use(express.json()); 
 
-// --- 2. ROUTES ---
-
-// Route de test rapide
-app.get('/test', (req, res) => {
-  res.send("Le serveur répond bien sur /test");
-});
-
 // Route GET pour récupérer les produits
 app.get('/api/products', async (req, res) => {
   console.log("Requête GET reçue sur /api/products");
@@ -48,6 +41,7 @@ app.delete('/api/products/:id', async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+  console.log("Tentative de suppression de l'ID:", req.params.id);
 });
 
 app.get('/', (req, res) => {
