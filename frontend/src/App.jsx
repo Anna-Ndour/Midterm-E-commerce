@@ -1,17 +1,19 @@
-import React from 'react';
+import React, { useState, useEffect} from 'react';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ProductCard from './components/ProductCard';
 
 function App() {
-  const products = [
-    { id: 1, name: "Wireless Headphones", price: 99 },
-    { id: 2, name: "Smart Watch", price: 199 },
-    { id: 3, name: "Gaming Mouse", price: 49 },
-    { id: 4, name: "Mechanical Keyboard", price: 129 },
-    { id: 5, name: "New Smartphone", price: 899 },
-    { id: 6, name: "Laptop Pro", price: 1499 }
-  ];
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+
+    fetch('http://localhost:5000/api/products')
+      .then(response => response.json())
+      .then(data => setProducts(data))
+      .catch(error=> console.error('Error fetching products:', error));
+
+  }, []);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
