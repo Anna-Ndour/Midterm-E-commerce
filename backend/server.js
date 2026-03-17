@@ -5,37 +5,59 @@ const sequelize = require('./config/db');
 const Product = require('./models/Product');
 
 dotenv.config();
-
 const app = express();
 
-app.use(cors());
-app.use(express.json());
+// --- 1. CONFIGURATION (MIDDLEWARES) ---
+// Toujours placer les middlewares AVANT les routes
+app.use(cors()); 
+app.use(express.json()); 
 
+// --- 2. ROUTES ---
+
+// Route de test rapide
+app.get('/test', (req, res) => {
+  res.send("Le serveur répond bien sur /test");
+});
+
+// Route GET pour récupérer les produits
 app.get('/api/products', async (req, res) => {
+  console.log("Requête GET reçue sur /api/products");
   try {
-
-    const productsFromDB = await Product.findAll();
-    res.json(productsFromDB);
-  } catch (error) {
-    res.status(500).json({ message: "Error fetching products" });
+    const data = await Product.findAll();
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 
+// Route POST pour créer un produit
 app.post('/api/products', async (req, res) => {
+  console.log("Requête POST reçue avec les données:", req.body);
   try {
-    const newProduct = await Product.create(req.body);
-    res.status(201).json(newProduct);
-  } catch (error) {
-    res.status(400).json({ message: "Error creating product" });
+    const newP = await Product.create(req.body);
+    res.status(201).json(newP);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
   }
 });
 
-app.get('/', (req , res) => {
+app.delete('/api/products/:id', async (req, res) => {
+  try {
+    await Product.destroy({ where: { id: req.params.id } });
+    res.json({ message: "Product deleted" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/', (req, res) => {
   res.send('Server is running!');
 });
 
+// --- 3. DÉMARRAGE ---
 const PORT = process.env.PORT || 5000;
-sequelize.sync().then(async() => {
+
+sequelize.sync().then(async () => {
   console.log('Database synced successfully');
 
   const count = await Product.count();
