@@ -5,9 +5,21 @@ import ProductCard from './components/ProductCard';
 
 function App() {
   // 1. États (States) pour stocker les données
+  const [cart, setCart] = useState([]);
   const [products, setProducts] = useState([]);
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
+  const [category, setCategory] = useState('');
+  const [description, setDescription] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const addToCart = (product) => {
+    setCart([...cart, product]);
+    console.log("Produit ajouté au panier :", product.name);
+    alert(`${product.name} has been added to your cart!`); // Petit message de confirmation
+  };
+  
 
   // 2. Charger les produits au démarrage (READ)
   useEffect(() => {
@@ -20,7 +32,7 @@ function App() {
   // 3. Fonction pour ajouter un produit (CREATE)
   const handleSubmit = (e) => {
     e.preventDefault();
-    const newProduct = { name, price: parseFloat(price) };
+    const newProduct = { name, price: parseFloat(price), imageUrl: imageUrl, category, description };
 
     fetch('http://localhost:5000/api/products', {
       method: 'POST',
@@ -32,6 +44,9 @@ function App() {
       setProducts([...products, addedProduct]); // Mise à jour de l'interface
       setName(''); // Reset du formulaire
       setPrice('');
+      setImageUrl('');
+      setCategory('');
+      setDescription('');
     })
     .catch((err) => console.error("Erreur création:", err));
   };
@@ -48,9 +63,15 @@ function App() {
     .catch((err) => console.error("Erreur suppression:", err));
   };
 
+  const filteredProducts = products.filter((product) => {
+  const nameMatch = product.name?.toLowerCase().includes(searchTerm.toLowerCase());
+  const categoryMatch = product.category?.toLowerCase().includes(searchTerm.toLowerCase());
+  return nameMatch || categoryMatch;
+});
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: '#f9f9f9' }}>
-      <Navbar />
+      <Navbar cartCount={cart.length} onSearch={setSearchTerm} />
       
       <main style={{ padding: '40px', flex: 1 }}>
         <h1 style={{ textAlign: 'center', color: '#333' }}>E-Commerce Dashboard</h1>
@@ -82,6 +103,26 @@ function App() {
               required 
               style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ddd' }}
             />
+            <input 
+              type="text" 
+              placeholder="URL de l'image" 
+              value={imageUrl} 
+              onChange={(e) => setImageUrl(e.target.value)} 
+              style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ddd' }}
+            />
+            <input 
+              type="text" 
+              placeholder="Catégorie" 
+              value={category} 
+              onChange={(e) => setCategory(e.target.value)} 
+              style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ddd' }}
+            />
+            <textarea 
+              placeholder="Description" 
+              value={description} 
+              onChange={(e) => setDescription(e.target.value)} 
+              style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ddd', minHeight: '80px' }}
+            />
             <button type="submit" style={{ 
               backgroundColor: '#2ecc71', 
               color: 'white', 
@@ -104,13 +145,17 @@ function App() {
           gap: '20px' 
         }}>
           {products.length > 0 ? (
-            products.map((product) => (
+            filteredProducts.map((product) => (
               <ProductCard 
                 key={product.id} 
                 id={product.id} 
                 name={product.name} 
                 price={product.price} 
-                onDelete={deleteProduct} // On transmet la fonction de suppression
+                imageUrl={product.imageUrl}
+                category={product.category}
+                description={product.description}
+                onDelete={deleteProduct}
+                onAddToCart={() => addToCart(product)} // On transmet la fonction d'ajout au panier
               />
             ))
           ) : (

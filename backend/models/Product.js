@@ -12,6 +12,13 @@ const Product = sequelize.define('Product', {
   },
   description: {
     type: DataTypes.TEXT
+  },
+  imageUrl: { 
+    type: DataTypes.STRING,
+    defaultValue: 'https://via.placeholder.com/150' // Une image par défaut si on oublie
+  },
+  category: {
+    type: DataTypes.STRING
   }
 });
 

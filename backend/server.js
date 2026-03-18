@@ -52,14 +52,16 @@ app.get('/', (req, res) => {
 const PORT = process.env.PORT || 5000;
 
 sequelize.sync().then(async () => {
-  console.log('Database synced successfully');
+  console.log('Database resetted and synced with new columns!');
 
   const count = await Product.count();
   if (count === 0) {
     await Product.create({
       name: "Database Headset",
       price: 150.00,
-      description: "First product from SQLite!"
+      description:"High-quality wireless headphones with noise isolation and long battery life. Perfect for music and calls.",
+      category: "Electronics",
+      imageUrl: "https://source.unsplash.com/400x400/?headphones"
     });
     console.log('First Product added to the database');
   }
