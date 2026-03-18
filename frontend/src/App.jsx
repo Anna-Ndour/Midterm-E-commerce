@@ -8,27 +8,24 @@ import Login from './components/Login';
 import CartPage from './components/CartPage';
 
 function App() {
-  // 1. ÉTATS (States)
   const [cart, setCart] = useState([]);
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  
-  // États pour le formulaire de création
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [category, setCategory] = useState('');
   const [description, setDescription] = useState('');
-
-  // 2. ACTIONS (Fonctions)
-  
-  // Ajouter au panier (Local)
   const addToCart = (product) => {
     setCart([...cart, product]);
     alert(`${product.name} added to cart!`);
   };
 
-  // Charger les produits (Depuis le Backend)
+  const removeFromCart = (indexToRemove) => {
+  const newCart = cart.filter((_, index) => index !== indexToRemove);
+  setCart(newCart);
+};
+
   useEffect(() => {
     fetch('http://localhost:5000/api/products')
       .then((res) => res.json())
@@ -36,7 +33,6 @@ function App() {
       .catch((err) => console.error("Erreur chargement:", err));
   }, []);
 
-  // Ajouter un nouveau produit (POST vers Backend)
   const handleSubmit = (e) => {
     e.preventDefault();
     const newProduct = { name, price: parseFloat(price), imageUrl, category, description };
@@ -49,13 +45,11 @@ function App() {
     .then((res) => res.json())
     .then((addedProduct) => {
       setProducts([...products, addedProduct]);
-      // Reset du formulaire
       setName(''); setPrice(''); setImageUrl(''); setCategory(''); setDescription('');
     })
     .catch((err) => console.error("Erreur création:", err));
   };
 
-  // Supprimer un produit (DELETE vers Backend)
   const deleteProduct = (id) => {
     fetch(`http://localhost:5000/api/products/${id}`, { method: 'DELETE' })
     .then(() => {
@@ -64,7 +58,6 @@ function App() {
     .catch((err) => console.error("Erreur suppression:", err));
   };
 
-  // 3. LOGIQUE DE RECHERCHE
   const filteredProducts = products.filter((product) => {
     const term = searchTerm.toLowerCase();
     return (
@@ -76,19 +69,16 @@ function App() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: '#f9f9f9' }}>
       
-      {/* Navbar visible sur toutes les pages */}
+    
       <Navbar cartCount={cart.length} onSearch={setSearchTerm} />
 
       <Routes>
-        {/* PAGE D'ACCUEIL */}
-        <Route path="/" element={<Home />} />
 
-        {/* PAGE CATALOGUE (Gestion & Affichage) */}
+        <Route path="/" element={<Home />} />
         <Route path="/products" element={
           <main style={{ padding: '40px', flex: 1 }}>
             <h1 style={{ textAlign: 'center', color: '#333', marginBottom: '30px' }}>Product Management</h1>
 
-            {/* FORMULAIRE D'AJOUT */}
             <section style={{ 
               maxWidth: '550px', margin: '0 auto 40px', padding: '25px', 
               backgroundColor: '#fff', borderRadius: '12px', boxShadow: '0 4px 15px rgba(0,0,0,0.1)' 
@@ -103,8 +93,6 @@ function App() {
                 <button type="submit" style={submitButtonStyle}>Create Product</button>
               </form>
             </section>
-
-            {/* GRILLE DES PRODUITS */}
             <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '25px' }}>
               {filteredProducts.length > 0 ? (
                 filteredProducts.map((product) => (
@@ -129,9 +117,9 @@ function App() {
           </main>
         } />
 
-        {/* AUTRES PAGES */}
+    
         <Route path="/login" element={<Login />} />
-        <Route path="/cart" element={<CartPage cart={cart} />} />
+        <Route path="/cart" element={<CartPage cart={cart} onRemove={removeFromCart} />} />
       </Routes>
 
       <Footer />
@@ -139,7 +127,6 @@ function App() {
   );
 }
 
-// STYLES RÉUTILISABLES
 const inputStyle = {
   padding: '12px',
   borderRadius: '8px',

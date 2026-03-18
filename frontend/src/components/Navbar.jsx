@@ -11,7 +11,7 @@ function Navbar({ cartCount, onSearch }) {
       backgroundColor: '#2c3e50', 
       color: 'white' 
     }}>
-      {/* 🏠 LOGO : Vers l'accueil (/) */}
+  
       <Link to="/" style={{ 
         color: 'white', 
         textDecoration: 'none', 
@@ -37,7 +37,7 @@ function Navbar({ cartCount, onSearch }) {
       </div>
 
       <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
-        {/* 📦 PRODUCTS : Vers le catalogue (/products) */}
+  
         <Link to="/products" style={{ color: 'white', textDecoration: 'none' }}>
           Products
         </Link>

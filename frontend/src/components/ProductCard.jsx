@@ -10,7 +10,7 @@ function ProductCard(props) {
       margin: '10px',
       textAlign: 'center',
       boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
-      backgroundColor: 'white' // Optionnel: pour mieux voir le relief
+      backgroundColor: 'white' 
     }}>
       <img 
         src={props.imageUrl || 'https://via.placeholder.com/150'} 
@@ -36,7 +36,7 @@ function ProductCard(props) {
           fontSize: '0.9rem', 
           color: '#666', 
           lineHeight: '1.4',
-          height: '60px', // Hauteur fixe pour que toutes les cartes soient égales
+          height: '60px', 
           overflow: 'hidden',
           textOverflow: 'ellipsis'
         }}>
@@ -57,7 +57,6 @@ function ProductCard(props) {
           Add to Cart
         </button>
 
-        {/* --- NOUVEAU BOUTON DELETE --- */}
         <button 
           onClick={() => props.onDelete(props.id)} 
           style={{
