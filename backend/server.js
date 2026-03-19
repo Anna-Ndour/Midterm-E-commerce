@@ -2,17 +2,49 @@ const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const sequelize = require('./config/db');
+
+
 const Product = require('./models/Product');
+const CartItem = require('./models/CartItem');
+const User = require('./models/User');
 
 dotenv.config();
 const app = express();
 
-// --- 1. CONFIGURATION (MIDDLEWARES) ---
-// Toujours placer les middlewares AVANT les routes
-app.use(cors()); 
-app.use(express.json()); 
 
-// Route GET pour récupérer les produits
+app.use(cors()); 
+app.use(express.json());
+
+app.get('/', (req, res) => res.send('Server is running!'));
+
+app.post('/api/auth/signup', async (req, res) => {
+  try {
+    const { username, email, password } = req.body;
+    const newUser = await User.create({ username, email, password });
+    res.status(201).json({ message: "User created!", user: { id: newUser.id, username: newUser.username } });
+  } catch (err) {
+    res.status(400).json({ error: "Email already exists or invalid data" });
+  }
+});
+
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ where: { email } });
+    if (!user) {
+      return res.status(404).json({ error: "User not found. Please sign up." });
+    }
+    if (user.password !== password) {
+      return res.status(401).json({ error: "Invalid password. Try again." });
+    }
+
+    res.json({ message: "Login successful", user: { id: user.id, username: user.username } });
+  } catch (err) {
+    res.status(500).json({ error: "Server error during login" });
+  }
+});
+
+
 app.get('/api/products', async (req, res) => {
   console.log("Requête GET reçue sur /api/products");
   try {
@@ -23,7 +55,6 @@ app.get('/api/products', async (req, res) => {
   }
 });
 
-// Route POST pour créer un produit
 app.post('/api/products', async (req, res) => {
   console.log("Requête POST reçue avec les données:", req.body);
   try {
@@ -44,28 +75,43 @@ app.delete('/api/products/:id', async (req, res) => {
   console.log("Tentative de suppression de l'ID:", req.params.id);
 });
 
-app.get('/', (req, res) => {
-  res.send('Server is running!');
+app.get('/api/cart', async (req, res) => {
+  try {
+    const items = await CartItem.findAll();
+    res.json(items);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// --- 3. DÉMARRAGE ---
+app.post('/api/cart', async (req, res) => {
+  try {
+    const newItem = await CartItem.create({
+      productId: req.body.id, 
+      name: req.body.name,
+      price: req.body.price,
+      imageUrl: req.body.imageUrl
+    });
+    res.status(201).json(newItem);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.delete('/api/cart/:id', async (req, res) => {
+  try {
+    await CartItem.destroy({ where: { id: req.params.id } });
+    res.json({ message: "Removed from cart" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 const PORT = process.env.PORT || 5000;
 
-sequelize.sync().then(async () => {
+sequelize.sync( {alter: true }).then(async () => {
   console.log('Database resetted and synced with new columns!');
-
-  const count = await Product.count();
-  if (count === 0) {
-    await Product.create({
-      name: "Database Headset",
-      price: 150.00,
-      description:"High-quality wireless headphones with noise isolation and long battery life. Perfect for music and calls.",
-      category: "Electronics",
-      imageUrl: "https://source.unsplash.com/400x400/?headphones"
-    });
-    console.log('First Product added to the database');
-  }
-
+ 
   app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
   });

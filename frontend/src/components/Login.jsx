@@ -1,12 +1,36 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = (e) => {
-    e.preventDefault();
-    console.log(`Connexion réussie pour : ${email}`);
+  const navigate = useNavigate();
+
+  const handleLogin = async (e) => {
+  e.preventDefault();
+
+  try {
+    const response = await fetch('http://localhost:5000/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      alert(`Welcome back, ${data.user.username}!`);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      
+      navigate('/');
+    } else {
+      alert(data.error || "Login failed");
+    }
+  } catch (err) {
+    console.error("Login error:", err);
+    alert("Impossible to connect to the server.");
+  }
    
 
   };
@@ -54,6 +78,16 @@ function Login() {
             </a>
           </div>
         </form>
+
+        <div style={{ textAlign: 'center', marginTop: '30px', color: '#7f8c8d' }}>
+          Don't have an account?{' '}
+          <span 
+            onClick={() => navigate('/signup')} 
+            style={{ color: '#3498db', cursor: 'pointer', fontWeight: 'bold' }}>
+            Sign Up
+          </span>
+        </div>
+        
       </div>
     </div>
   );

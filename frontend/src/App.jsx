@@ -4,8 +4,10 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ProductCard from './components/ProductCard';
 import Home from './components/Home';
+import Signup from './components/Signup';
 import Login from './components/Login';
 import CartPage from './components/CartPage';
+
 
 function App() {
   const [cart, setCart] = useState([]);
@@ -16,21 +18,49 @@ function App() {
   const [imageUrl, setImageUrl] = useState('');
   const [category, setCategory] = useState('');
   const [description, setDescription] = useState('');
-  const addToCart = (product) => {
-    setCart([...cart, product]);
-    alert(`${product.name} added to cart!`);
+
+  const addToCart = async (product) => { 
+    try {
+      const response = await fetch('http://localhost:5000/api/cart', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(product),
+      });
+
+      if (!response.ok) {
+        const newItem = await response.json();
+        setCart([...cart, newItem]);
+      }
+    }  catch (err) {
+      console.error("Error adding to cart:", err);
+    }
   };
 
-  const removeFromCart = (indexToRemove) => {
-  const newCart = cart.filter((_, index) => index !== indexToRemove);
-  setCart(newCart);
+  const removeFromCart = async (cartItemId) => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/cart/${cartItemId}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        setCart(cart.filter(item => item.id !== cartItemId));
+      }
+    }  catch (err) {
+      console.error("Error removing from cart:", err);
+
+    }
 };
 
   useEffect(() => {
     fetch('http://localhost:5000/api/products')
       .then((res) => res.json())
       .then((data) => setProducts(data))
-      .catch((err) => console.error("Erreur chargement:", err));
+      .catch((err) => console.error("Loading Error:", err));
+
+      fetch('http://localhost:5000/api/cart')
+      .then((res) => res.json())
+      .then((data) => setCart(data))
+      .catch((err) => console.error("Loading Error:", err));
   }, []);
 
   const handleSubmit = (e) => {
@@ -116,8 +146,7 @@ function App() {
             </div>
           </main>
         } />
-
-    
+        <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
         <Route path="/cart" element={<CartPage cart={cart} onRemove={removeFromCart} />} />
       </Routes>

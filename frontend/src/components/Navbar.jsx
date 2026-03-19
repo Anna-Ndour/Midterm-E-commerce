@@ -41,6 +41,10 @@ function Navbar({ cartCount, onSearch }) {
         <Link to="/products" style={{ color: 'white', textDecoration: 'none' }}>
           Products
         </Link>
+
+        <Link to="/signup" style={{ color: 'white', textDecoration: 'none' }}>
+          Sign Up
+        </Link>
         
         <Link to="/login" style={{ color: 'white', textDecoration: 'none' }}>
           Login

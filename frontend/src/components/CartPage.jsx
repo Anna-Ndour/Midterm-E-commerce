@@ -13,8 +13,8 @@ function CartPage({ cart, onRemove }) {
         </div>
       ) : (
         <div style={{ marginTop: '30px' }}>
-          {cart.map((item, index) => (
-            <div key={index} style={cartItemStyle}>
+          {cart.map((item) => (
+            <div key={item.id} style={cartItemStyle}>
               <img src={item.imageUrl} alt={item.name} style={cartImageStyle} />
               
               <div style={{ flex: 1, marginLeft: '20px' }}>
@@ -23,7 +23,7 @@ function CartPage({ cart, onRemove }) {
               </div>
 
               <button 
-                onClick={() => onRemove(index)} 
+                onClick={() => onRemove(item.id)} 
                 style={removeButtonStyle}
               >
                 Remove
