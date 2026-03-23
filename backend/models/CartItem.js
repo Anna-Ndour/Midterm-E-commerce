@@ -15,8 +15,10 @@ const CartItem = sequelize.define('CartItem', {
     allowNull: false
   },
   imageUrl: {
-    type: DataTypes.STRING
+    type: DataTypes.STRING,
   }
 });
+
+
 
 module.exports = CartItem;
