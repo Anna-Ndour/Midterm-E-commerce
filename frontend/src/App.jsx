@@ -7,6 +7,7 @@ import Home from './components/Home';
 import Signup from './components/Signup';
 import Login from './components/Login';
 import CartPage from './components/CartPage';
+import { use } from 'react';
 
 
 function App() {
@@ -18,6 +19,12 @@ function App() {
   const [imageUrl, setImageUrl] = useState('');
   const [category, setCategory] = useState('');
   const [description, setDescription] = useState('');
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const savedUser =JSON.parse(localStorage.getItem('user'));
+    setUser(savedUser);
+  }, []);
 
   const addToCart = async (product) => { 
     try {
@@ -65,7 +72,7 @@ function App() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const newProduct = { name, price: parseFloat(price), imageUrl, category, description };
+    const newProduct = { name, price: parseFloat(price), imageUrl, category, description, adminRole: user.role };
 
     fetch('http://localhost:5000/api/products', {
       method: 'POST',
@@ -102,27 +109,30 @@ function App() {
     
       <Navbar cartCount={cart.length} onSearch={setSearchTerm} />
 
-      <Routes>
-
-        <Route path="/" element={<Home />} />
-        <Route path="/products" element={
-          <main style={{ padding: '40px', flex: 1 }}>
-            <h1 style={{ textAlign: 'center', color: '#333', marginBottom: '30px' }}>Product Management</h1>
-
-            <section style={{ 
-              maxWidth: '550px', margin: '0 auto 40px', padding: '25px', 
-              backgroundColor: '#fff', borderRadius: '12px', boxShadow: '0 4px 15px rgba(0,0,0,0.1)' 
-            }}>
-              <h3 style={{ marginTop: 0, color: '#2c3e50' }}>Add a New Item</h3>
-              <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      {user && user.role=== 'admin'? (
+        <section className="admin-form">
+          <h2 style={{ textAlign: 'center', color: '#2c3e50', marginTop: '30px' }}>Admin Panel - Add New Product</h2>
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 <input type="text" placeholder="Product Name" value={name} onChange={(e) => setName(e.target.value)} required style={inputStyle} />
                 <input type="number" placeholder="Price ($)" value={price} onChange={(e) => setPrice(e.target.value)} required style={inputStyle} />
                 <input type="text" placeholder="Image URL (Unsplash link)" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} style={inputStyle} />
                 <input type="text" placeholder="Category" value={category} onChange={(e) => setCategory(e.target.value)} style={inputStyle} />
                 <textarea placeholder="Product Description" value={description} onChange={(e) => setDescription(e.target.value)} style={{ ...inputStyle, minHeight: '80px' }} />
                 <button type="submit" style={submitButtonStyle}>Create Product</button>
-              </form>
-            </section>
+          </form>
+        </section>
+      ) : (
+        <div className="client-message">
+          <p style={{ textAlign: 'center', color: '#888', marginTop: '20px' }}>Welcome to our store! Browse products and add them to your cart.</p>
+        </div>
+      )}
+
+      <Routes>
+
+        <Route path="/" element={<Home />} />
+        <Route path="/products" element={
+          <main style={{ padding: '40px', flex: 1 }}>
+            <h1 style={{ textAlign: 'center', color: '#333', marginBottom: '30px' }}>Product Management</h1>
             <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '25px' }}>
               {filteredProducts.length > 0 ? (
                 filteredProducts.map((product) => (

@@ -2,8 +2,6 @@ const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const sequelize = require('./config/db');
-
-
 const Product = require('./models/Product');
 const CartItem = require('./models/CartItem');
 const User = require('./models/User');
@@ -38,8 +36,12 @@ app.post('/api/auth/login', async (req, res) => {
       return res.status(401).json({ error: "Invalid password. Try again." });
     }
 
-    res.json({ message: "Login successful", user: { id: user.id, username: user.username } });
-  } catch (err) {
+    res.json({ 
+      message: "Login successful",
+      user: { id: user.id, username: user.username, role: user.role 
+    } });
+  } 
+  catch (err) {
     res.status(500).json({ error: "Server error during login" });
   }
 });
@@ -56,7 +58,11 @@ app.get('/api/products', async (req, res) => {
 });
 
 app.post('/api/products', async (req, res) => {
-  console.log("Requête POST reçue avec les données:", req.body);
+  const { adminRole, name, price, imageUrl, category, description } = req.body;
+  if (adminRole !== 'admin') {
+    return res.status(403).json({ error: "Unauthorized: Admin role required" });
+  }
+  
   try {
     const newP = await Product.create(req.body);
     res.status(201).json(newP);
