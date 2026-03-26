@@ -8,7 +8,7 @@ import Signup from './components/Signup';
 import Login from './components/Login';
 import CartPage from './components/CartPage';
 
-
+const API_BASE_URL = 'https://ams-e-commerce.onrender.com';
 
 function App() {
   const [cart, setCart] = useState([]);
@@ -33,12 +33,12 @@ function App() {
 }, []);
 
   useEffect(() => {
-    fetch('https://ams-e-commerce.onrender.com//api/products')
+    fetch('${API_BASE_URL}/api/products')
       .then((res) => res.json())
       .then((data) => setProducts(data))
       .catch((err) => console.error("Loading Error:", err));
 
-    fetch('https://ams-e-commerce.onrender.com//api/cart')
+    fetch('${API_BASE_URL}/api/cart')
       .then((res) => res.json())
       .then((data) => setCart(data))
       .catch((err) => console.error("Loading Error:", err));
@@ -46,7 +46,7 @@ function App() {
 
   const addToCart = async (product) => { 
     try {
-      const response = await fetch('https://ams-e-commerce.onrender.com//api/cart', {
+      const response = await fetch('${API_BASE_URL}/api/cart', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(product),
@@ -63,7 +63,7 @@ function App() {
 
   const removeFromCart = async (cartItemId) => {
     try {
-      const response = await fetch(`https://ams-e-commerce.onrender.com//api/cart/${cartItemId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/cart/${cartItemId}`, {
         method: 'DELETE',
       });
 
@@ -87,7 +87,7 @@ function App() {
     };
 
 
-    fetch('https://ams-e-commerce.onrender.com//api/products', {
+    fetch('${API_BASE_URL}/api/products', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(newProduct)
@@ -101,7 +101,7 @@ function App() {
   };
 
   const deleteProduct = (id) => {
-    fetch(`https://ams-e-commerce.onrender.com//api/products/${id}`, { method: 'DELETE' })
+    fetch(`${API_BASE_URL}/api/products/${id}`, { method: 'DELETE' })
     .then(() => {
       setProducts(products.filter((p) => p._id !== id));
     })
