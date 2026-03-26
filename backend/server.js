@@ -9,8 +9,41 @@ const User = require('./models/User');
 dotenv.config();
 const app = express();
 
+const seedProducts = [
+  {
+    name: "Wireless Headphones",
+    price: 99.99,
+    description: "High-quality sound with noise cancellation.",
+    category: "Electronics",
+    imageUrl: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500"
+  },
+  {
+    name: "Smart Watch",
+    price: 199.50,
+    description: "Track your fitness and notifications on the go.",
+    category: "Wearables",
+    imageUrl: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500"
+  },
+  {
+    name: "Leather Backpack",
+    price: 75.00,
+    description: "Durable and stylish backpack for everyday use.",
+    category: "Accessories",
+    imageUrl: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=500"
+  },
+  {
+    name: "Mechanical Keyboard",
+    price: 120.00,
+    description: "RGB backlit keys with a satisfying tactile feel.",
+    category: "Computing",
+    imageUrl: "https://images.unsplash.com/photo-1511467687858-23d96c32e4ae?w=500"
+  }
+];
+
+app.use(cors()); 
+app.use(express.json());
+
 const dbURI = "mongodb+srv://admin:test123@ecommerce.dzlh56d.mongodb.net/?appName=Ecommerce";
-console.log("⏳ Tentative de connexion...");
 
 mongoose.connect(dbURI) 
   .then(() => {
@@ -19,10 +52,6 @@ mongoose.connect(dbURI)
   .catch((err) => {
     console.log("Error connecting to MongoDB:", err.message);
   });
-
-
-app.use(cors()); 
-app.use(express.json());
 
 mongoose.connect(process.env.MONGO_URI)
   .then(async () => {
@@ -139,37 +168,6 @@ app.delete('/api/cart/:id', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
-
-const seedProducts = [
-  {
-    name: "Wireless Headphones",
-    price: 99.99,
-    description: "High-quality sound with noise cancellation.",
-    category: "Electronics",
-    imageUrl: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500"
-  },
-  {
-    name: "Smart Watch",
-    price: 199.50,
-    description: "Track your fitness and notifications on the go.",
-    category: "Wearables",
-    imageUrl: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500"
-  },
-  {
-    name: "Leather Backpack",
-    price: 75.00,
-    description: "Durable and stylish backpack for everyday use.",
-    category: "Accessories",
-    imageUrl: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=500"
-  },
-  {
-    name: "Mechanical Keyboard",
-    price: 120.00,
-    description: "RGB backlit keys with a satisfying tactile feel.",
-    category: "Computing",
-    imageUrl: "https://images.unsplash.com/photo-1511467687858-23d96c32e4ae?w=500"
-  }
-];
  
   app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
