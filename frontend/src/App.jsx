@@ -33,12 +33,12 @@ function App() {
 }, []);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/products')
+    fetch('https://ams-e-commerce.onrender.com//api/products')
       .then((res) => res.json())
       .then((data) => setProducts(data))
       .catch((err) => console.error("Loading Error:", err));
 
-    fetch('http://localhost:5000/api/cart')
+    fetch('https://ams-e-commerce.onrender.com//api/cart')
       .then((res) => res.json())
       .then((data) => setCart(data))
       .catch((err) => console.error("Loading Error:", err));
@@ -46,7 +46,7 @@ function App() {
 
   const addToCart = async (product) => { 
     try {
-      const response = await fetch('http://localhost:5000/api/cart', {
+      const response = await fetch('https://ams-e-commerce.onrender.com//api/cart', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(product),
@@ -63,7 +63,7 @@ function App() {
 
   const removeFromCart = async (cartItemId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/cart/${cartItemId}`, {
+      const response = await fetch(`https://ams-e-commerce.onrender.com//api/cart/${cartItemId}`, {
         method: 'DELETE',
       });
 
@@ -87,7 +87,7 @@ function App() {
     };
 
 
-    fetch('http://localhost:5000/api/products', {
+    fetch('https://ams-e-commerce.onrender.com//api/products', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(newProduct)
@@ -101,7 +101,7 @@ function App() {
   };
 
   const deleteProduct = (id) => {
-    fetch(`http://localhost:5000/api/products/${id}`, { method: 'DELETE' })
+    fetch(`https://ams-e-commerce.onrender.com//api/products/${id}`, { method: 'DELETE' })
     .then(() => {
       setProducts(products.filter((p) => p._id !== id));
     })
