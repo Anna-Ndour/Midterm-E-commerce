@@ -1,22 +1,27 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/db');
+const mongoose = require('mongoose');
 
-const CartItem = sequelize.define('CartItem', {
-  productId: { // On garde l'ID original du produit
-    type: DataTypes.INTEGER,
-    allowNull: false
+const CartItemSchema = new mongoose.Schema({
+  productId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Product',
+    required: true
   },
   name: {
-    type: DataTypes.STRING,
-    allowNull: false
+    type: String,
+    required: true
   },
   price: {
-    type: DataTypes.FLOAT,
-    allowNull: false
+    type: Number,
+    required: true
   },
   imageUrl: {
-    type: DataTypes.STRING,
+    type: String,
+    default: 'https://via.placeholder.com/150'
+  },
+  userId: {
+    type : mongoose.Schema.Types.ObjectId,
+    ref: 'User'
   }
 });
 
-module.exports = CartItem;
+module.exports = mongoose.model('CartItem', CartItemSchema);

@@ -7,7 +7,7 @@ import Home from './components/Home';
 import Signup from './components/Signup';
 import Login from './components/Login';
 import CartPage from './components/CartPage';
-import { use } from 'react';
+
 
 
 function App() {
@@ -22,8 +22,26 @@ function App() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const savedUser =JSON.parse(localStorage.getItem('user'));
-    setUser(savedUser);
+  const savedUser = localStorage.getItem('user');
+  if (savedUser) {
+    try {
+      setUser(JSON.parse(savedUser));
+    } catch (error) {
+      console.error("Erreur de lecture du LocalStorage", error);
+    }
+  }
+}, []);
+
+  useEffect(() => {
+    fetch('http://localhost:5000/api/products')
+      .then((res) => res.json())
+      .then((data) => setProducts(data))
+      .catch((err) => console.error("Loading Error:", err));
+
+    fetch('http://localhost:5000/api/cart')
+      .then((res) => res.json())
+      .then((data) => setCart(data))
+      .catch((err) => console.error("Loading Error:", err));
   }, []);
 
   const addToCart = async (product) => { 
@@ -34,11 +52,11 @@ function App() {
         body: JSON.stringify(product),
       });
 
-      if (!response.ok) {
+      if (response.ok) { 
         const newItem = await response.json();
         setCart([...cart, newItem]);
       }
-    }  catch (err) {
+    } catch (err) {
       console.error("Error adding to cart:", err);
     }
   };
@@ -50,29 +68,24 @@ function App() {
       });
 
       if (response.ok) {
-        setCart(cart.filter(item => item.id !== cartItemId));
+        setCart(cart.filter(item => item._id !== cartItemId));
       }
-    }  catch (err) {
+    } catch (err) {
       console.error("Error removing from cart:", err);
-
     }
-};
-
-  useEffect(() => {
-    fetch('http://localhost:5000/api/products')
-      .then((res) => res.json())
-      .then((data) => setProducts(data))
-      .catch((err) => console.error("Loading Error:", err));
-
-      fetch('http://localhost:5000/api/cart')
-      .then((res) => res.json())
-      .then((data) => setCart(data))
-      .catch((err) => console.error("Loading Error:", err));
-  }, []);
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const newProduct = { name, price: parseFloat(price), imageUrl, category, description, adminRole: user.role };
+    const newProduct = { 
+      name, 
+      price: parseFloat(price), 
+      imageUrl, 
+      category, 
+      description, 
+      adminRole: user?.role 
+    };
+
 
     fetch('http://localhost:5000/api/products', {
       method: 'POST',
@@ -84,15 +97,15 @@ function App() {
       setProducts([...products, addedProduct]);
       setName(''); setPrice(''); setImageUrl(''); setCategory(''); setDescription('');
     })
-    .catch((err) => console.error("Erreur création:", err));
+    .catch((err) => console.error("Creation error:", err));
   };
 
   const deleteProduct = (id) => {
     fetch(`http://localhost:5000/api/products/${id}`, { method: 'DELETE' })
     .then(() => {
-      setProducts(products.filter((p) => p.id !== id));
+      setProducts(products.filter((p) => p._id !== id));
     })
-    .catch((err) => console.error("Erreur suppression:", err));
+    .catch((err) => console.error("Deletion error:", err));
   };
 
   const filteredProducts = products.filter((product) => {
@@ -137,8 +150,8 @@ function App() {
               {filteredProducts.length > 0 ? (
                 filteredProducts.map((product) => (
                   <ProductCard 
-                    key={product.id} 
-                    id={product.id}
+                    key={product._id} 
+                    id={product._id}
                     name={product.name}
                     price={product.price}
                     imageUrl={product.imageUrl}
@@ -157,7 +170,7 @@ function App() {
           </main>
         } />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/login" element={<Login />} />
+        <Route path="/login" element={<Login setUser={setUser} />} />
         <Route path="/cart" element={<CartPage cart={cart} onRemove={removeFromCart} />} />
       </Routes>
 

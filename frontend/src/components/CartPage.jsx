@@ -1,29 +1,32 @@
 import React from 'react';
 
 function CartPage({ cart, onRemove }) {
-  const total = cart.reduce((sum, item) => sum + item.price, 0);
+  // Calcul du total (vérifie que cart est bien un tableau pour éviter les erreurs)
+  const total = cart ? cart.reduce((sum, item) => sum + (item.price || 0), 0) : 0;
 
   return (
     <div style={{ padding: '40px', maxWidth: '800px', margin: '0 auto', flex: 1 }}>
       <h1 style={{ textAlign: 'center', color: '#2c3e50' }}>🛒 Your Shopping Cart</h1>
 
-      {cart.length === 0 ? (
+      {!cart || cart.length === 0 ? (
         <div style={{ textAlign: 'center', marginTop: '50px' }}>
           <p style={{ fontSize: '1.2rem', color: '#888' }}>Your cart is empty.</p>
         </div>
       ) : (
         <div style={{ marginTop: '30px' }}>
           {cart.map((item) => (
-            <div key={item.id} style={cartItemStyle}>
+            <div key={item._id} style={cartItemStyle}>
               <img src={item.imageUrl} alt={item.name} style={cartImageStyle} />
               
               <div style={{ flex: 1, marginLeft: '20px' }}>
                 <h3 style={{ margin: '0 0 5px 0' }}>{item.name}</h3>
-                <p style={{ color: '#7f8c8d', margin: 0 }}>${item.price.toFixed(2)}</p>
+                <p style={{ color: '#7f8c8d', margin: 0 }}>
+                  ${item.price ? item.price.toFixed(2) : "0.00"}
+                </p>
               </div>
 
               <button 
-                onClick={() => onRemove(item.id)} 
+                onClick={() => onRemove(item._id)} 
                 style={removeButtonStyle}
               >
                 Remove
@@ -41,6 +44,8 @@ function CartPage({ cart, onRemove }) {
   );
 }
 
+// --- Styles (placés à l'extérieur de la fonction pour plus de clarté) ---
+
 const cartItemStyle = {
   display: 'flex',
   alignItems: 'center',
@@ -51,7 +56,12 @@ const cartItemStyle = {
   boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
 };
 
-const cartImageStyle = { width: '60px', height: '60px', objectFit: 'cover', borderRadius: '5px' };
+const cartImageStyle = { 
+  width: '60px', 
+  height: '60px', 
+  objectFit: 'cover', 
+  borderRadius: '5px' 
+};
 
 const removeButtonStyle = {
   backgroundColor: '#ff4757',
@@ -63,7 +73,25 @@ const removeButtonStyle = {
   fontWeight: 'bold'
 };
 
-const summaryStyle = { marginTop: '30px', padding: '20px', borderTop: '2px solid #ddd', display: 'flex', flexDirection: 'column', alignItems: 'flex-end' };
-const checkoutButtonStyle = { backgroundColor: '#27ae60', color: 'white', border: 'none', padding: '12px 30px', borderRadius: '5px', fontSize: '1.1rem', fontWeight: 'bold', cursor: 'pointer', marginTop: '10px' };
+const summaryStyle = { 
+  marginTop: '30px', 
+  padding: '20px', 
+  borderTop: '2px solid #ddd', 
+  display: 'flex', 
+  flexDirection: 'column', 
+  alignItems: 'flex-end' 
+};
+
+const checkoutButtonStyle = { 
+  backgroundColor: '#27ae60', 
+  color: 'white', 
+  border: 'none', 
+  padding: '12px 30px', 
+  borderRadius: '5px', 
+  fontSize: '1.1rem', 
+  fontWeight: 'bold', 
+  cursor: 'pointer', 
+  marginTop: '10px' 
+};
 
 export default CartPage;

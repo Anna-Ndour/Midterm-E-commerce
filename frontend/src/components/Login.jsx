@@ -22,7 +22,7 @@ function Login() {
     if (response.ok) {
       alert(`Welcome back, ${data.user.username}!`);
       localStorage.setItem('user', JSON.stringify(data.user));
-      
+      setUser(data.user);
       navigate('/');
     } else {
       alert(data.error || "Login failed");
